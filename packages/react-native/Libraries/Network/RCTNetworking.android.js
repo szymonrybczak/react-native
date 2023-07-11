@@ -10,10 +10,7 @@
 
 import type {RequestBody} from './convertRequestBody';
 
-// Do not require the native RCTNetworking module directly! Use this wrapper module instead.
-// It will add the necessary requestId, so that you don't have to generate it yourself.
-import NativeEventEmitter from '../EventEmitter/NativeEventEmitter';
-import Platform from '../Utilities/Platform';
+import RCTDeviceEventEmitter from '../EventEmitter/RCTDeviceEventEmitter';
 import convertRequestBody from './convertRequestBody';
 import NativeNetworkingAndroid from './NativeNetworkingAndroid';
 
@@ -34,20 +31,61 @@ function generateRequestId(): number {
   return _requestId++;
 }
 
-/**
- * This class is a wrapper around the native RCTNetworking module. It adds a necessary unique
- * requestId to each network request that can be used to abort that request later on.
- */
-// FIXME: use typed events
-class RCTNetworking extends NativeEventEmitter<$FlowFixMe> {
-  constructor() {
-    super(
-      // T88715063: NativeEventEmitter only used this parameter on iOS. Now it uses it on all platforms, so this code was modified automatically to preserve its behavior
-      // If you want to use the native module on other platforms, please remove this condition and test its behavior
-      Platform.OS !== 'ios' ? null : NativeNetworkingAndroid,
-    );
-  }
+type RCTNetworkingEventDefinitions = $ReadOnly<{
+  didSendNetworkData: [
+    [
+      number, // requestId
+      number, // progress
+      number, // total
+    ],
+  ],
+  didReceiveNetworkResponse: [
+    [
+      number, // requestId
+      number, // statusCode
+      ?{[string]: string}, // headers
+      ?string, // url
+    ],
+  ],
+  didReceiveNetworkData: [
+    [
+      number, // requestId
+      string, // data
+    ],
+  ],
+  didReceiveNetworkIncrementalData: [
+    [
+      number, // requestId
+      string, // data
+      number, // progress
+      number, // total
+    ],
+  ],
+  didReceiveNetworkDataProgress: [
+    [
+      number, // requestId
+      number, // progress
+      number, // total
+    ],
+  ],
+  didCompleteNetworkResponse: [
+    [
+      number, // requestId
+      string, // error
+      ?boolean, // timeOutError
+    ],
+  ],
+}>;
 
+const RCTNetworking = {
+  addListener<K: $Keys<RCTNetworkingEventDefinitions>>(
+    eventType: K,
+    listener: (...$ElementType<RCTNetworkingEventDefinitions, K>) => mixed,
+    context?: mixed,
+  ): EventSubscription {
+    // $FlowFixMe[incompatible-call]
+    return RCTDeviceEventEmitter.addListener(eventType, listener, context);
+  },
   sendRequest(
     method: string,
     trackingName: string,
@@ -80,15 +118,13 @@ class RCTNetworking extends NativeEventEmitter<$FlowFixMe> {
       withCredentials,
     );
     callback(requestId);
-  }
-
+  },
   abortRequest(requestId: number) {
     NativeNetworkingAndroid.abortRequest(requestId);
-  }
-
-  clearCookies(callback: (result: boolean) => any) {
+  },
+  clearCookies(callback: (result: boolean) => void) {
     NativeNetworkingAndroid.clearCookies(callback);
-  }
-}
+  },
+};
 
-export default (new RCTNetworking(): RCTNetworking);
+export default RCTNetworking;
