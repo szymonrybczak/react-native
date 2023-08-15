@@ -8,189 +8,44 @@
  * @flow
  */
 
-const React = require('react');
-const RNTesterListFilters = require('./RNTesterListFilters');
-const {
-  StyleSheet,
-  TextInput,
-  View,
-  ScrollView,
-  Image,
-  Platform,
-} = require('react-native');
-import {RNTesterThemeContext} from './RNTesterTheme';
+import React, {Suspense, use} from 'react';
+import {View, Text} from 'react-native';
 
-import type {SectionData} from '../types/RNTesterTypes';
-
-type Props<T> = {
-  filter: Function,
-  render: Function,
-  disableSearch?: boolean,
-  testID?: string,
-  hideFilterPills?: boolean,
-  page: 'examples_page' | 'components_page' | 'bookmarks_page',
-  sections: $ReadOnlyArray<SectionData<T>>,
-  ...
+const fetchComments = async () => {
+  const request = await fetch('https://jsonplaceholder.typicode.com/todos/1');
+  console.log('f');
+  return await request.json();
 };
 
-type State = {filter: string, category: string, ...};
+const ComponentWithUse = () => {
+  const {title} = use(fetchComments());
 
-class RNTesterExampleFilter<T> extends React.Component<Props<T>, State> {
-  state: State = {filter: '', category: ''};
+  return (
+    <View>
+      <Text>{title}</Text>
+    </View>
+  );
+};
 
-  render(): React.Node {
-    const filterText = this.state.filter;
-    let filterRegex = /.*/;
+const AsyncComponent = async () => {
+  const {title} = await fetchComments();
 
-    try {
-      filterRegex = new RegExp(String(filterText), 'i');
-    } catch (error) {
-      console.warn(
-        'Failed to create RegExp: %s\n%s',
-        filterText,
-        error.message,
-      );
-    }
+  return (
+    <View>
+      <Text>{title}</Text>
+    </View>
+  );
+};
 
-    const filter = (example: T) => {
-      const category = this.state.category;
-      return (
-        this.props.disableSearch ||
-        this.props.filter({example, filterRegex, category})
-      );
-    };
-
-    let filteredSections = this.props.sections.map(section => ({
-      ...section,
-      data: section.data.filter(filter),
-    }));
-
-    if (this.state.filter.trim() !== '' || this.state.category.trim() !== '') {
-      filteredSections = filteredSections.filter(
-        section => section.title !== 'Recently Viewed',
-      );
-    }
-
-    return (
-      <View style={styles.container}>
-        {this._renderTextInput()}
-        {this._renderFilteredSections(filteredSections)}
-      </View>
-    );
-  }
-
-  _renderFilteredSections(
-    filteredSections: $ReadOnlyArray<{
-      data: Array<T>,
-      key: string,
-      title: string,
-    }>,
-  ): React.Node {
-    if (this.props.page === 'examples_page') {
-      return (
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="interactive">
-          {this.props.render({filteredSections})}
-        </ScrollView>
-      );
-    } else {
-      return this.props.render({filteredSections});
-    }
-  }
-
-  _renderTextInput(): ?React.Element<any> {
-    if (this.props.disableSearch) {
-      return null;
-    }
-    return (
-      <RNTesterThemeContext.Consumer>
-        {theme => {
-          return (
-            <View
-              style={[
-                styles.searchRow,
-                {
-                  backgroundColor:
-                    Platform.OS === 'ios'
-                      ? theme.SystemBackgroundColor
-                      : theme.BackgroundColor,
-                },
-              ]}>
-              <View style={styles.textInputStyle}>
-                <Image
-                  source={require('../assets/search-icon.png')}
-                  style={styles.searchIcon}
-                />
-                <TextInput
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  clearButtonMode="always"
-                  onChangeText={text => {
-                    this.setState(() => ({filter: text}));
-                  }}
-                  placeholder="Search..."
-                  placeholderTextColor={theme.PlaceholderTextColor}
-                  underlineColorAndroid="transparent"
-                  style={[
-                    styles.searchTextInput,
-                    {
-                      color: theme.LabelColor,
-                      backgroundColor: theme.SecondaryGroupedBackgroundColor,
-                      borderColor: theme.QuaternaryLabelColor,
-                    },
-                  ]}
-                  testID={this.props.testID}
-                  value={this.state.filter}
-                />
-              </View>
-              {!this.props.hideFilterPills && (
-                <RNTesterListFilters
-                  onFilterButtonPress={filterLabel =>
-                    this.setState({category: filterLabel})
-                  }
-                />
-              )}
-            </View>
-          );
-        }}
-      </RNTesterThemeContext.Consumer>
-    );
-  }
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  searchRow: {
-    paddingHorizontal: 20,
-    paddingVertical: 6,
-    alignItems: 'center',
-  },
-  searchTextInput: {
-    borderRadius: 6,
-    borderWidth: 1,
-    paddingVertical: 0,
-    height: 35,
-    flex: 1,
-    alignSelf: 'center',
-    paddingLeft: 35,
-  },
-  textInputStyle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    position: 'relative',
-    right: 10,
-  },
-  searchIcon: {
-    width: 20,
-    height: 20,
-    position: 'relative',
-    top: 0,
-    left: 27,
-    zIndex: 2,
-  },
-});
+const RNTesterExampleFilter = () => {
+  return (
+    <View>
+      <Suspense>
+        {/* <ComponentWithUse /> */}
+        <AsyncComponent />
+      </Suspense>
+    </View>
+  );
+};
 
 module.exports = RNTesterExampleFilter;

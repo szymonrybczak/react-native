@@ -40,7 +40,7 @@
     "packages/*"
   ],
   "peerDependencies": {
-    "react": "18.2.0"
+    "react": "18.3.0-canary-a20eea251-20230809"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
@@ -93,7 +93,7 @@
     "nullthrows": "^1.1.1",
     "prettier": "2.8.8",
     "prettier-plugin-hermes-parser": "0.14.0",
-    "react": "18.2.0",
+    "react": "18.3.0-canary-a20eea251-20230809",
     "react-test-renderer": "18.2.0",
     "shelljs": "^0.8.5",
     "signedsource": "^1.0.0",

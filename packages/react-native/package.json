@@ -88,7 +88,7 @@
     "prepack": "cp ../../README.md ."
   },
   "peerDependencies": {
-    "react": "18.2.0"
+    "react": "18.3.0-canary-a20eea251-20230809"
   },
   "dependencies": {
     "@jest/create-cache-key-function": "^29.2.1",

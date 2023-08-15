@@ -9609,10 +9609,10 @@ react-test-renderer@18.2.0:
     react-shallow-renderer "^16.15.0"
     scheduler "^0.23.0"
 
-react@18.2.0:
-  version "18.2.0"
-  resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"
-  integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
+react@18.3.0-canary-a20eea251-20230809:
+  version "18.3.0-canary-a20eea251-20230809"
+  resolved "https://registry.yarnpkg.com/react/-/react-18.3.0-canary-a20eea251-20230809.tgz#762a8430202080e8888e6fdb238ffdfabcb3c83d"
+  integrity sha512-dfgntcGWODKZJolxVU9cvJgD5KJ5mJ70teUk4d5lXYSYO1QScCLalRTBNLKY0TUkVZzt4c3hOy261woJkO6EhA==
   dependencies:
     loose-envify "^1.1.0"
 
