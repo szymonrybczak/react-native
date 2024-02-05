@@ -52,7 +52,10 @@ function runMacOS(_, _ctx, args) {
     logger.warn(
       'Argument --configuration has been deprecated and will be removed in a future release, please use --mode instead.',
     );
-    args.mode = args.configuration;
+
+    if (!args.mode) {
+      args.mode = args.configuration;
+    }
   }
 
   process.chdir(args.projectPath);
@@ -289,11 +292,12 @@ module.exports = {
     {
       name: '--mode [string]',
       description:
-        'Explicitly set the scheme configuration to use. This option is case sensitive.',
+        'Explicitly set the scheme configuration to use, corresponds to `--configuration` in `xcodebuild` command, e.g. Debug, Release.',
     },
     {
       name: '--scheme [string]',
-      description: 'Explicitly set Xcode scheme to use',
+      description:
+        'Explicitly set Xcode scheme to use, corresponds to `--scheme` in `xcodebuild` command.',
     },
     {
       name: '--project-path [string]',
